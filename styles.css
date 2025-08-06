@@ -546,6 +546,103 @@ input[type="text"]:focus, select:focus {
     animation: slideInUp 0.4s ease-out;
 }
 
+#forgeBody {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* Inventory section at the top */
+.inventory-section {
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid var(--border-glow);
+    border-radius: 8px;
+}
+
+.inventory-section h4 {
+    text-align: center;
+    color: var(--glow-purple);
+    margin-bottom: 1rem;
+    font-family: var(--font-heading);
+}
+
+.inventory-display {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+}
+
+.inventory-item {
+    font-size: 1rem;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    background: var(--panel-bg);
+    border-radius: 6px;
+    border: 1px solid var(--border-glow);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Grid for crafting blueprints */
+.recipe-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+}
+
+/* Individual recipe card styling */
+.recipe-card {
+    border: 2px solid var(--border-glow);
+    border-radius: 8px;
+    padding: 1rem;
+    background: linear-gradient(145deg, rgba(30, 41, 59, 0.8), rgba(11, 17, 32, 0.8));
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.recipe-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0 20px rgba(34, 211, 238, 0.4);
+    border-color: var(--glow-cyan);
+}
+
+.recipe-card h4 {
+    font-family: var(--font-heading);
+    color: var(--glow-cyan);
+    margin-bottom: 0.5rem;
+}
+
+.recipe-card .requirements {
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    flex-grow: 1; /* Pushes the button to the bottom */
+    opacity: 0.8;
+}
+
+.recipe-card .requirements span {
+    display: block;
+    margin-top: 0.25rem;
+}
+
+/* Clearer button states */
+.recipe-card .btn.disabled {
+    background: #374151; /* Dark gray */
+    cursor: not-allowed;
+    filter: brightness(0.8);
+}
+
+.recipe-card .btn.crafted {
+    background: linear-gradient(90deg, #10b981, #34d399); /* Green gradient */
+    cursor: default;
+    color: var(--space-black);
+}
+
+
+
 .modal-header {
     display: flex;
     justify-content: space-between;
@@ -806,6 +903,65 @@ input[type="text"]:focus, select:focus {
     display: block;
 }
 
+
+/* --- Skill Core Styles --- */
+.skill-cores-container {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+}
+
+.skill-core {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: var(--panel-bg);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-glow);
+    width: 200px;
+}
+
+.core-icon {
+    font-size: 1.5rem;
+}
+
+.core-details {
+    flex-grow: 1;
+}
+
+.core-name {
+    font-size: 0.8rem;
+    font-weight: 500;
+    opacity: 0.9;
+}
+
+.core-level {
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: var(--glow-cyan);
+}
+
+.core-progress-bar {
+    width: 100%;
+    height: 6px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 4px;
+}
+
+.core-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--glow-cyan), var(--glow-purple));
+    width: 0%;
+    border-radius: 3px;
+    transition: width 0.5s ease;
+}
+
+
 /* Animations */
 @keyframes fadeIn {
     from { opacity: 0; }
@@ -927,3 +1083,4 @@ input[type="text"]:focus, select:focus {
     overflow-wrap: break-word;
     word-wrap: break-word;
 }
+

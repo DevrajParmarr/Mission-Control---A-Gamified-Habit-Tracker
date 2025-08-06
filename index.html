@@ -43,7 +43,6 @@
             <button class="theme-toggle" id="themeToggle">🌙</button>
             <div class="logo">🚀 Mission Control</div>
             <div class="tagline">Take Control in your Hand</div>
-            <div class="level-display" id="levelDisplay">Level: 1</div>
 
             
             <div class="time-analysis-container" id="timeAnalysisContainer" >
@@ -75,9 +74,10 @@
 
         <div class="info-grid">
             <div class="info-card" id="lessonsTrigger">
-                <div class="info-header"><span>📡</span><h3>Daily Briefing</h3></div>
-                <p>Decode daily intel on DSA, Web Dev, and Core CSE with quizzes.</p>
-            </div>
+    <div class="info-header"><span>📡</span><h3>Daily Briefing</h3></div>
+    <p>Read daily intel on key subjects or test your skills in the simulator.</p>
+  
+</div>
             <div class="info-card" id="bookQuoteTrigger">
                 <div class="info-header"><span>📚</span><h3>Library</h3></div>
                 <p>Access insights from foundational self-help and productivity texts.</p>
@@ -87,10 +87,47 @@
                 <div class="info-header"><span>🏆</span><h3>Achievements</h3></div>
                 <p>View your earned badges and milestones!</p>
             </div>
+
+      
+
+            <div class="info-card" id="forgeTrigger">
+    <div class="info-header"><span>🛠️</span><h3>The Forge</h3></div>
+    <p>Use components earned from missions to craft powerful upgrades.</p>
+</div>
+
+
         </div>
 
         <div class="main-content">
             <div class="panel">
+
+                           <div class="skill-cores-container">
+    <div class="skill-core" id="core-dsa">
+        <span class="core-icon">🔮</span>
+        <div class="core-details">
+            <span class="core-name">Algorithm Core</span>
+            <div class="core-level">Lvl 1</div>
+            <div class="core-progress-bar"><div class="core-progress-fill"></div></div>
+        </div>
+    </div>
+    <div class="skill-core" id="core-dev">
+        <span class="core-icon">🛠️</span>
+        <div class="core-details">
+            <span class="core-name">Development Core</span>
+            <div class="core-level">Lvl 1</div>
+            <div class="core-progress-bar"><div class="core-progress-fill"></div></div>
+        </div>
+    </div>
+    <div class="skill-core" id="core-cse">
+        <span class="core-icon">📚</span>
+        <div class="core-details">
+            <span class="core-name">Theory Core</span>
+            <div class="core-level">Lvl 1</div>
+            <div class="core-progress-bar"><div class="core-progress-fill"></div></div>
+        </div>
+    </div>
+</div>
+
                 <h2>🛰️ Set New Mission</h2>
                 <div class="input-group">
                     <input type="text" id="taskInput" placeholder="Enter mission...">
@@ -160,6 +197,9 @@
             </div>
     </div>
 </div>
+
+
+
                 
             </div>
         </div>
@@ -229,6 +269,25 @@
             <div class="modal-body" id="achievementsModalBody"></div>
         </div>
     </div>
+
+    <div class="modal-overlay hidden" id="forgeModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>🛠️ The Forge</h2>
+            <button class="close-btn" id="closeForgeModal">&times;</button>
+        </div>
+        <div class="modal-body" id="forgeBody">
+            <div class="inventory-display" id="inventoryDisplay">
+                </div>
+            <hr>
+            <h4>Available Blueprints:</h4>
+            <div class="recipe-grid" id="recipeGrid">
+                </div>
+        </div>
+    </div>
+</div>
+
+
 
       <script src="script.js"></script>
 

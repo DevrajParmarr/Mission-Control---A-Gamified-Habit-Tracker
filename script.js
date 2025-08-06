@@ -8,8 +8,78 @@
         };
 
         // --- Daily Content Data ---
-   
-        
+   let craftedItems = [];
+let inventory = { 'scrap': 0, 'crystal': 0, 'datachip': 0 }; // ADD THIS
+
+let researchPoints = 0, unlockedTech = [], completedChallenges = [];
+
+
+const components = {
+    // Common Components
+    'scrap': { name: 'Nano-Steel Scrap', icon: '🔩', rarity: 'common' },
+    'datachip': { name: 'Encrypted Data Chip', icon: '💾', rarity: 'common' },
+    
+    // Uncommon Components
+    'crystal': { name: 'Quantum Crystal', icon: '💎', rarity: 'uncommon' },
+    'circuit': { name: 'Micro-Circuitry', icon: '⚙️', rarity: 'uncommon' },
+    
+    // Rare Component
+    'core': { name: 'Sentient AI Core', icon: '🧠', rarity: 'rare' }
+};
+
+const craftingRecipes = {
+    // --- Consumables (Single-Use Boosts) ---
+    'boost_rp_1': {
+        name: 'RP Booster (30 min)',
+        type: 'consumable',
+        description: 'Doubles all RP earned from completing tasks for 30 minutes.',
+        cost: { 'datachip': 15, 'crystal': 5 }
+    },
+    'boost_comp_1': {
+        name: 'Component Magnet (1 hour)',
+        type: 'consumable',
+        description: 'Doubles your chance of finding components for one hour.',
+        cost: { 'scrap': 30, 'circuit': 2 }
+    },
+
+    // --- Permanent Upgrades & Blueprints ---
+    'theme_nebula': {
+        name: 'Nebula Theme Blueprint',
+        type: 'permanent',
+        description: 'A vibrant theme of purple and blue cosmic clouds.',
+        cost: { 'crystal': 15 }
+    },
+    'theme_aurora': {
+        name: 'Aurora Theme Blueprint',
+        type: 'permanent',
+        description: 'A brilliant green and cyan theme inspired by polar lights.',
+        cost: { 'crystal': 30, 'datachip': 5 }
+    },
+    'theme_gold': {
+        name: 'Gilded Galaxy Blueprint',
+        type: 'permanent',
+        description: 'An elegant black and gold theme for the discerning user.',
+        cost: { 'crystal': 50, 'circuit': 10, 'core': 1 } // Requires a rare core
+    },
+    'focus_bonus_1': {
+        name: 'Focus Capacitor Mk. I',
+        type: 'permanent',
+        description: 'Permanently increases RP gain from Focus Mode by 10%.',
+        cost: { 'scrap': 20, 'datachip': 10 }
+    },
+    'focus_bonus_2': {
+        name: 'Focus Capacitor Mk. II',
+        type: 'permanent',
+        description: 'Increases RP gain from Focus Mode by an additional 15%.',
+        cost: { 'scrap': 40, 'datachip': 25, 'circuit': 2 }
+    },
+    'component_finder_1': {
+        name: 'Component Scanner',
+        type: 'permanent',
+        description: 'Permanently increases the chance to find components by 5%.',
+        cost: { 'scrap': 50, 'circuit': 1 }
+    }
+};
         const motivationalQuotes = [
     'The journey of a thousand miles begins with a single step.',
     'Discipline is the bridge between goals and accomplishment.',
@@ -802,11 +872,17 @@ const achievementData = [
     { id: 'app_veteran', name: 'App Veteran', description: 'Used the app for 100 days total!', icon: ' V' }
 ];
 
+
   //.......
 
 //...................
      
     
+let skillCores = {
+    'dsa': { xp: 0, level: 1 },
+    'dev': { xp: 0, level: 1 },
+    'cse': { xp: 0, level: 1 }
+};
         // --- Core App State ---
         let tasks = [], completionHistory = {}, timeLog = {}, currentStreak = 0, discoveredStreaks = [], achievements = [], userLevel = 1;
         let timerInterval = null, timerSeconds = 0, activeTimerTaskId = null;
@@ -864,12 +940,15 @@ const achievementData = [
         window.addEventListener('resize', initStarfield);
 
 
+
         // --- Core App Logic ---
 
 // Utility to get the day of the year
 function getDayOfYear() {
     return Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
 }
+
+
 
 // Add a new task
 function addTask() {
@@ -905,10 +984,44 @@ function completeTask(taskId) {
     showLoading();
     const task = tasks.find(t => t.id === taskId);
     if (task) {
+        if (!task.completed) {
+            let scannerBonus = 0; 
+            const dropChance = 0.35 + scannerBonus;
+
+             const coreMap = {
+                'DSA': 'dsa',
+                'Development': 'dev',
+                'project': 'dev', // Projects also grant dev XP
+                'CSE': 'cse'
+                // 'other' tasks don't grant XP
+            };
+            const coreToUpdate = coreMap[task.category];
+            if (coreToUpdate) {
+                addXP(coreToUpdate, 15); // Award 15 XP per task
+            }
+
+            if (Math.random() < dropChance) {
+                const rand = Math.random();
+                let componentToAward;
+
+                if (rand < 0.60) { // 60% chance for a common component
+                    componentToAward = Math.random() < 0.5 ? 'scrap' : 'datachip';
+                } else if (rand < 0.95) { // 35% chance for an uncommon component
+                    componentToAward = Math.random() < 0.5 ? 'crystal' : 'circuit';
+                } else { // 5% chance for a rare component
+                    componentToAward = 'core';
+                }
+                
+                inventory[componentToAward]++;
+                showNotification(`Found: +1 ${components[componentToAward].name}!`);
+            }
+        }
         task.completed = !task.completed;
+        
         const today = new Date().toDateString();
         const todayTasks = tasks.filter(t => t.createdAt === today);
         const allComplete = todayTasks.every(t => t.completed);
+
         if (todayTasks.some(t => t.completed)) {
             completionHistory[today] = { completed: true, perfect: allComplete };
             if (allComplete && !achievements.some(a => a.id === 'perfect_day')) {
@@ -917,6 +1030,7 @@ function completeTask(taskId) {
         } else {
             delete completionHistory[today];
         }
+
         renderTasks();
         updateStats();
         renderCalendar();
@@ -999,7 +1113,6 @@ function updateStats() {
     document.getElementById('streakDisplay').textContent = currentStreak;
     document.getElementById('fireIcon').classList.toggle('active', currentStreak > 0);
     document.getElementById('progressFill').style.width = `${completionRate}%`;
-    document.getElementById('levelDisplay').textContent = `Level: ${userLevel}`;
 
     renderTimeAnalysis();
     updateMissionInsight();
@@ -1128,6 +1241,92 @@ function startTimer(taskId) {
     }
 }
 
+
+// Forge Functions ---
+
+function renderForge() {
+    renderInventory();
+    renderRecipes();
+    showModal('forgeModal');
+}
+
+function renderInventory() {
+    const inventoryDisplay = document.getElementById('inventoryDisplay');
+    inventoryDisplay.innerHTML = Object.keys(inventory).map(key => `
+        <div class="inventory-item">
+            ${components[key].icon} ${components[key].name}: ${inventory[key]}
+        </div>
+    `).join('');
+}
+
+function renderRecipes() {
+    const recipeGrid = document.getElementById('recipeGrid');
+    recipeGrid.innerHTML = ''; // Clear old recipes
+
+    for (const id in craftingRecipes) {
+        const recipe = craftingRecipes[id];
+        const isCrafted = craftedItems.includes(id);
+        let canCraft = true;
+        let requirementsHTML = '';
+
+        for (const componentId in recipe.cost) {
+            const requiredAmount = recipe.cost[componentId];
+            const hasAmount = inventory[componentId];
+            if (hasAmount < requiredAmount) {
+                canCraft = false;
+            }
+            // Use colors to show if the user has enough materials
+            const hasEnoughClass = hasAmount >= requiredAmount ? 'has-enough' : 'not-enough';
+            requirementsHTML += `<span class="${hasEnoughClass}">${components[componentId].icon} ${requiredAmount} ${components[componentId].name} (You have ${hasAmount})</span>`;
+        }
+
+        const recipeEl = document.createElement('div');
+        recipeEl.className = 'recipe-card';
+        
+        let buttonHTML = '';
+        if (isCrafted) {
+            buttonHTML = `<button class="btn crafted" disabled>Crafted</button>`;
+        } else {
+            buttonHTML = `<button class="btn ${!canCraft ? 'disabled' : ''}" onclick="craftItem('${id}')">Craft</button>`;
+        }
+
+        recipeEl.innerHTML = `
+            <h4>${recipe.name}</h4>
+            <div class="requirements">${requirementsHTML}</div>
+            ${buttonHTML}
+        `;
+        recipeGrid.appendChild(recipeEl);
+    }
+}
+
+function craftItem(itemId) {
+    if (craftedItems.includes(itemId)) {
+        showNotification("You've already crafted this item!");
+        return;
+    }
+
+    const recipe = craftingRecipes[itemId];
+    let canCraft = true;
+    for (const componentId in recipe.cost) {
+        if (inventory[componentId] < recipe.cost[componentId]) {
+            canCraft = false;
+            break;
+        }
+    }
+
+    if (canCraft) {
+        for (const componentId in recipe.cost) {
+            inventory[componentId] -= recipe.cost[componentId];
+        }
+
+        craftedItems.push(itemId); // Add to the list of crafted items
+        showNotification(`Crafted: ${recipe.name}!`);
+        saveData();
+        renderForge(); // Re-render the forge to update everything
+    } else {
+        showNotification("You don't have the required components!");
+    }
+}
 function toggleTimer() {
     const timerControlBtn = document.getElementById('timerControlBtn');
     if (timerInterval) {
@@ -1188,7 +1387,16 @@ function saveData() {
     localStorage.setItem('achievements', JSON.stringify(achievements));
     localStorage.setItem('discoveredStreaks', JSON.stringify(discoveredStreaks));
     localStorage.setItem('userLevel', userLevel);
+    localStorage.setItem('inventory', JSON.stringify(inventory));
+    localStorage.setItem('craftedItems', JSON.stringify(craftedItems));
+     craftedItems = JSON.parse(localStorage.getItem('craftedItems') || '[]');
+      localStorage.setItem('completedChallenges', JSON.stringify(completedChallenges));
+    localStorage.setItem('skillCores', JSON.stringify(skillCores));
+
+
 }
+
+
 
 // Load data from localStorage
 function loadData() {
@@ -1198,13 +1406,22 @@ function loadData() {
     achievements = JSON.parse(localStorage.getItem('achievements') || '[]');
     discoveredStreaks = JSON.parse(localStorage.getItem('discoveredStreaks') || '[]');
     userLevel = parseInt(localStorage.getItem('userLevel') || '1');
+
+    inventory = JSON.parse(localStorage.getItem('inventory') || '{"scrap": 0, "crystal": 0, "datachip": 0}');
+
+      completedChallenges = JSON.parse(localStorage.getItem('completedChallenges') || '[]');
+    // ADD THIS line, with a default value
+    skillCores = JSON.parse(localStorage.getItem('skillCores') || '{"dsa":{"xp":0,"level":1},"dev":{"xp":0,"level":1},"cse":{"xp":0,"level":1}}');
+
+}
     renderTasks();
     updateStats();
     renderCalendar();
-}
+
 
 // Initialize app
 document.addEventListener('DOMContentLoaded', () => {
+    // Inside your DOMContentLoaded block
     loadData();
 });
 
@@ -1242,12 +1459,38 @@ function unlockAchievement(achievementId) {
     }
 }
 
+// --- Skill Core Functions ---
+
+function addXP(core, amount) {
+    skillCores[core].xp += amount;
+    const xpForNextLevel = skillCores[core].level * 100; // e.g., Level 1 -> 100 XP, Level 2 -> 200 XP
+
+    if (skillCores[core].xp >= xpForNextLevel) {
+        skillCores[core].level++;
+        skillCores[core].xp -= xpForNextLevel; // Reset XP for the new level
+        showNotification(`${core.toUpperCase()} Core leveled up to ${skillCores[core].level}!`);
+    }
+    renderSkillCores(); // Update the UI
+    saveData();
+}
+
+function renderSkillCores() {
+    for (const core in skillCores) {
+        const coreData = skillCores[core];
+        const xpForNextLevel = coreData.level * 100;
+        const progressPercent = (coreData.xp / xpForNextLevel) * 100;
+
+        const container = document.getElementById(`core-${core}`);
+        container.querySelector('.core-level').textContent = `Lvl ${coreData.level}`;
+        container.querySelector('.core-progress-fill').style.width = `${progressPercent}%`;
+    }
+}
+
 function renderAchievements() {
     const achievementsModalBody = document.getElementById('achievementsModalBody');
     achievementsModalBody.innerHTML = achievements.length > 0 ? achievements.map(a => `
         <div class="achievement-item">
             <span class="achievement-icon">${a.icon}</span>
-            {/* V V V V  ADD THE CLASS "achievement-text" TO THIS DIV V V V V */}
             <div class="achievement-text"> 
                 <div class="achievement-name">${a.name}</div>
                 <div class="achievement-desc">${a.description}</div>
@@ -1330,6 +1573,7 @@ function renderBookQuoteModal() {
     `;
     showModal('bookQuoteModal');
 }
+
 
 
 
@@ -1536,7 +1780,6 @@ document.getElementById('weeklyReportTrigger').addEventListener('click', renderW
 document.getElementById('analyticsTrigger').addEventListener('click', renderAnalyticsDashboard);
 document.getElementById('closeLessonsModal').addEventListener('click', () => hideModal('lessonsModal'));
 document.getElementById('closeBookQuoteModal').addEventListener('click', () => hideModal('bookQuoteModal'));
-document.getElementById('closeConstellationModal').addEventListener('click', () => hideModal('constellationModal'));
 document.getElementById('closeTimerModal').addEventListener('click', () => {
     stopTimer();
     hideModal('focus-timer-modal');
@@ -1557,6 +1800,8 @@ setInterval(() => {
 
 // Initialize Achievements on Load
 document.addEventListener('DOMContentLoaded', () => {
+    loadData();
+    renderSkillCores();
     renderAchievements();
 });
 
@@ -1585,3 +1830,7 @@ document.getElementById('closeArchiveModal').addEventListener('click', () => hid
 
 document.getElementById('monthlyReportTrigger').addEventListener('click', renderMonthlyReport);
 document.getElementById('closeMonthlyReportModal').addEventListener('click', () => hideModal('monthlyReportModal'));
+
+// Add with your other listeners
+document.getElementById('forgeTrigger').addEventListener('click', renderForge);
+document.getElementById('closeForgeModal').addEventListener('click', () => hideModal('forgeModal'));
