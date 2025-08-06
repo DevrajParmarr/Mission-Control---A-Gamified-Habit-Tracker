@@ -1119,56 +1119,73 @@ function updateStats() {
     updateMissionInsight();
 }
 
-// Render calendar with completion history
+
 function renderCalendar() {
-    const calendar = document.getElementById('calendar');
-    const svg = document.getElementById('constellation-svg');
-    calendar.innerHTML = '';
-    svg.innerHTML = '';
-    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    days.forEach(day => {
-        const dayEl = document.createElement('div');
-        dayEl.className = 'calendar-day header';
-        dayEl.textContent = day;
-        calendar.appendChild(dayEl);
-    });
+    const svg = document.getElementById('starmap-svg');
+    const container = document.getElementById('starmapContainer');
+    if (!svg || !container) return; // Stop if elements don't exist
+
+    svg.innerHTML = ''; // Clear previous drawings
+    const containerRect = container.getBoundingClientRect();
+    const width = containerRect.width;
+    const height = containerRect.height;
+    const padding = 40; // Space from the edges
 
     const today = new Date();
-    const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1).getDay();
+    document.getElementById('starmapMonthLabel').textContent = today.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
     const daysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
+    const activeDaysCoords = [];
+    const tooltipGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    svg.appendChild(tooltipGroup);
 
-    for (let i = 0; i < firstDayOfMonth; i++) {
-        const emptyDay = document.createElement('div');
-        emptyDay.className = 'calendar-day inactive';
-        calendar.appendChild(emptyDay);
-    }
-
-    const activeDays = [];
     for (let i = 1; i <= daysInMonth; i++) {
         const date = new Date(today.getFullYear(), today.getMonth(), i);
         const dateString = date.toDateString();
-        const dayEl = document.createElement('div');
-        dayEl.className = `calendar-day ${completionHistory[dateString]?.completed ? 'active' : 'inactive'}`;
-        if (completionHistory[dateString]?.perfect) dayEl.classList.add('perfect-day');
-        dayEl.innerHTML = `<span class="day-number">${i}</span>`;
-        if (completionHistory[dateString]?.completed) {
-            const star = document.createElement('div');
-            star.className = 'day-star';
-            dayEl.appendChild(star);
-            activeDays.push({ x: (calendar.children.length % 7) * 50 + 25, y: Math.floor(calendar.children.length / 7) * 50 + 25 });
+        const dayInfo = completionHistory[dateString];
+
+        // Position the stars in a pleasant, semi-random way
+        const x = padding + Math.random() * (width - padding * 2);
+        const y = (i / daysInMonth) * (height - padding * 2) + padding;
+
+        const star = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        star.setAttribute('cx', x);
+        star.setAttribute('cy', y);
+        star.setAttribute('r', 4);
+        star.setAttribute('class', 'star');
+
+        if (dayInfo?.completed) {
+            star.classList.add('star-active');
+            if (dayInfo.perfect) {
+                star.classList.add('star-perfect');
+            }
+            activeDaysCoords.push({ x, y });
         }
-        calendar.appendChild(dayEl);
+        svg.appendChild(star);
+
+        // Create the tooltip for this star
+        const tooltip = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        tooltip.setAttribute('x', x);
+        tooltip.setAttribute('y', y - 12);
+        tooltip.setAttribute('class', 'starmap-tooltip');
+        tooltip.textContent = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        tooltipGroup.appendChild(tooltip);
+
+        // Show/hide tooltip on hover
+        star.addEventListener('mouseenter', () => tooltip.style.opacity = '1');
+        star.addEventListener('mouseleave', () => tooltip.style.opacity = '0');
     }
 
-    if (activeDays.length > 1) {
-        for (let i = 1; i < activeDays.length; i++) {
+    // Draw the connecting lines
+    if (activeDaysCoords.length > 1) {
+        for (let i = 1; i < activeDaysCoords.length; i++) {
             const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            line.setAttribute('class', 'constellation-line');
-            line.setAttribute('x1', activeDays[i - 1].x);
-            line.setAttribute('y1', activeDays[i - 1].y);
-            line.setAttribute('x2', activeDays[i].x);
-            line.setAttribute('y2', activeDays[i].y);
-            svg.appendChild(line);
+            line.setAttribute('x1', activeDaysCoords[i - 1].x);
+            line.setAttribute('y1', activeDaysCoords[i - 1].y);
+            line.setAttribute('x2', activeDaysCoords[i].x);
+            line.setAttribute('y2', activeDaysCoords[i].y);
+            line.setAttribute('class', 'starmap-line');
+            svg.insertBefore(line, svg.firstChild); // Draw lines behind stars
         }
     }
 }

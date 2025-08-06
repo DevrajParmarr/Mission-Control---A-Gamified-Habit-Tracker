@@ -393,85 +393,77 @@ input[type="text"]:focus, select:focus {
 }
 
 /* Calendar */
-.calendar-container {
+
+.starmap-container {
     position: relative;
-}
-
-.calendar-toggle {
-    display: block;
-    margin: 0.5rem auto;
-    padding: 0.5rem 1rem;
-    background: var(--glow-cyan);
-    color: var(--space-black);
-    border: none;
-    border-radius: 0.5rem;
-    cursor: pointer;
-    font-size: 0.9rem;
-    transition: transform 0.3s ease;
-}
-
-.calendar-toggle:hover {
-    transform: scale(1.05);
-}
-
-.calendar-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: clamp(0.25rem, 1vw, 0.5rem);
-    margin-top: 1rem;
-    max-height: 120px;
+    width: 100%;
+    aspect-ratio: 16 / 9; /* Maintain a widescreen aspect ratio */
+    background: radial-gradient(ellipse at bottom, #1e3a8a 0%, #0b1120 70%);
+    border-radius: 0.75rem;
     overflow: hidden;
-    transition: max-height 0.5s ease;
+    border: 1px solid var(--border-glow);
 }
 
-.calendar-grid.expanded {
-    max-height: 500px;
+#starmap-svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
 }
 
-.calendar-day {
-    aspect-ratio: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: clamp(0.7rem, 1.5vw, 0.8rem);
-    font-weight: 500;
-    border-radius: 0.5rem;
-    transition: background 0.3s ease, transform 0.3s ease;
-}
-
-.calendar-day.header {
-    font-weight: bold;
-    color: var(--glow-cyan);
-}
-
-.calendar-day.inactive {
+/* Style for the month label (e.g., "August 2025") */
+.starmap-month-label {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: var(--font-heading);
     color: var(--star-white);
     opacity: 0.6;
+    font-size: 1rem;
 }
 
-.calendar-day.active {
-    background: rgba(34, 211, 238, 0.2);
+/* Style for the stars (SVG circles) */
+.star {
+    fill: rgba(255, 255, 255, 0.4);
+    transition: all 0.3s ease;
 }
 
-.calendar-day.perfect-day {
-    background: rgba(192, 132, 252, 0.3);
-    box-shadow: 0 0 10px var(--glow-purple);
-}
-
-.calendar-day .day-star {
-    position: absolute;
-    width: 5px;
-    height: 5px;
-    background: var(--glow-cyan);
-    border-radius: 50%;
-    animation: starPulse 1.5s ease-in-out infinite;
-}
-
-.constellation-line {
+.star-active {
+    fill: var(--glow-cyan);
     stroke: var(--glow-cyan);
-    stroke-width: 1.5;
-    stroke-dasharray: 3 3;
-    animation: dash 2s linear infinite;
+    stroke-width: 8px;
+    stroke-opacity: 0.2;
+    cursor: pointer;
+}
+
+.star-perfect {
+    fill: var(--glow-purple);
+    stroke: var(--glow-purple);
+}
+
+.star:hover {
+    transform: scale(1.5);
+    transform-origin: center;
+}
+
+/* Style for the connecting lines */
+.starmap-line {
+    stroke: rgba(34, 211, 238, 0.4);
+    stroke-width: 1.5px;
+    stroke-dasharray: 4 4;
+}
+
+/* Style for the tooltip that appears on hover */
+.starmap-tooltip {
+    font-family: var(--font-primary);
+    font-size: 12px;
+    fill: var(--star-white);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    text-anchor: middle;
+    pointer-events: none; /* Allows clicks to pass through to the star */
 }
 
 /* Progress Bar */
