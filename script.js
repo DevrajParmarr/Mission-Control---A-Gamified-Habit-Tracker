@@ -1330,19 +1330,7 @@ function renderBookQuoteModal() {
     showModal('bookQuoteModal');
 }
 
-// Constellation Modal
-function renderConstellationModal() {
-    const streakIndex = Math.min(currentStreak, constellationData.length - 1);
-    const constellation = constellationData[streakIndex];
-    document.getElementById('constellationModalBody').innerHTML = `
-        <div class="lesson-category">
-            <h3>${constellation.name}</h3>
-            <p>${constellation.description}</p>
-            <p class="source">Current Streak: ${currentStreak} days</p>
-        </div>
-    `;
-    showModal('constellationModal');
-}
+
 
 // Weekly Report Modal
 function renderWeeklyReportModal() {
@@ -1452,7 +1440,7 @@ function rotateMotivationalQuote() {
 document.getElementById('themeToggle').addEventListener('click', toggleTheme);
 document.getElementById('lessonsTrigger').addEventListener('click', renderLessonsModal);
 document.getElementById('bookQuoteTrigger').addEventListener('click', renderBookQuoteModal);
-document.getElementById('constellationTrigger').addEventListener('click', renderConstellationModal);
+
 document.getElementById('achievementsTrigger').addEventListener('click', () => {
     renderAchievements();
     showModal('achievementsModal');

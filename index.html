@@ -36,7 +36,7 @@
     </div>
 
 
-        <script src="script.js"></script>
+      
 
     <div class="container">
         <div class="header">
@@ -46,7 +46,7 @@
             <div class="level-display" id="levelDisplay">Level: 1</div>
 
             
-            <div class="time-analysis-container id="timeAnalysisContainer" >
+            <div class="time-analysis-container" id="timeAnalysisContainer" >
                     <h3>⏱️ YOUR FOCUS DISTRIBUTION
                         
                     </h3>
@@ -82,10 +82,7 @@
                 <div class="info-header"><span>📚</span><h3>Library</h3></div>
                 <p>Access insights from foundational self-help and productivity texts.</p>
             </div>
-            <div class="info-card" id="constellationTrigger">
-                <div class="info-header"><span>🌌</span><h3>Constellation Guide</h3></div>
-                <p>Discover daily constellations to spark conversation and inspiration.</p>
-            </div>
+          
             <div class="info-card" id="achievementsTrigger">
                 <div class="info-header"><span>🏆</span><h3>Achievements</h3></div>
                 <p>View your earned badges and milestones!</p>
@@ -147,26 +144,7 @@
 
     <!-- Modals -->
 
-    <div class="modal-overlay hidden" id="focus-timer-modal">
-        <div class="modal-content">
-            <div class="modal-header"><h2>⏱️ Focus Mode Engaged</h2><button class="close-btn" id="closeTimerModal">&times;</button></div>
-            <div class="modal-body">
-                <h3 class="timer-mission-name" id="timerMissionName"></h3>
-                <div class="timer-display">
-                    <svg width="200" height="200" viewBox="0 0 120 120">
-                        <circle class="timer-ring-bg" cx="60" cy="60" r="54" />
-                        <circle class="timer-ring-progress" id="timerRing" cx="60" cy="60" r="54" stroke-dasharray="339.292" stroke-dashoffset="339.292" />
-                    </svg>
-                    <div class="timer-text" id="timerText">00:00</div>
-                </div>
-                <div class="timer-controls">
-                    <button class="btn" id="timerControlBtn">Pause</button>
-                    <button class="btn" id="stopTimerBtn">Stop & Save</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    
+  
     <div class="modal-overlay hidden" id="lessonsModal">
         <div class="modal-content">
             <div class="modal-header"><h2>📡 Daily Briefing</h2><button class="close-btn" id="closeLessonsModal">&times;</button></div>
@@ -174,12 +152,14 @@
             <div class="quiz-container" id="quizContainer"></div>
         </div>
     </div>
+
     <div class="modal-overlay hidden" id="bookQuoteModal">
-        <div class="modal-content">
-            <div class="modal-header"><h2>📚 Library</h2><button class="close-btn" id="closeBookQuoteModal">&times;</button></div>
-            <div class="modal-body" id="bookQuoteModalBody"></div>
-        </div>
+    <div class="modal-content">
+        <div class="modal-header"><h2>📚 Library</h2><button class="close-btn" id="closeBookQuoteModal">&times;</button></div>
+        <div class="modal-body" id="bookQuoteModalBody"></div>
     </div>
+</div>
+    
     <div class="modal-overlay hidden" id="constellationModal">
         <div class="modal-content">
             <div class="modal-header"><h2>🌌 Constellation Guide</h2><button class="close-btn" id="closeConstellationModal">&times;</button></div>
@@ -227,6 +207,7 @@
         </div>
     </div>
 
+      <script src="script.js"></script>
 
  
 </body>
