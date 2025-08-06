@@ -1084,3 +1084,16 @@ input[type="text"]:focus, select:focus {
     word-wrap: break-word;
 }
 
+/* --- Locked Button Style --- */
+.btn-small.disabled {
+    background: #4a5568; /* A muted, dark gray */
+    color: #a0aec0;      /* Lighter gray text */
+    cursor: not-allowed;
+    filter: grayscale(80%);
+}
+
+/* Prevents the hover effect on disabled buttons */
+.btn-small.disabled:hover {
+    background: #4a5568;
+    transform: none;
+}

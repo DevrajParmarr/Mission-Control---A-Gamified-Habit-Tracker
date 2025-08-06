@@ -118,14 +118,7 @@
             <div class="core-progress-bar"><div class="core-progress-fill"></div></div>
         </div>
     </div>
-    <div class="skill-core" id="core-cse">
-        <span class="core-icon">📚</span>
-        <div class="core-details">
-            <span class="core-name">Theory Core</span>
-            <div class="core-level">Lvl 1</div>
-            <div class="core-progress-bar"><div class="core-progress-fill"></div></div>
-        </div>
-    </div>
+    
 </div>
 
                 <h2>🛰️ Set New Mission</h2>
@@ -235,12 +228,13 @@
             <div class="modal-body">
                 <h3 class="timer-mission-name" id="timerMissionName"></h3>
                 <div class="timer-display">
-                    <svg width="200" height="200" viewBox="0 0 120 120">
-                        <circle class="timer-ring-bg" cx="60" cy="60" r="54" />
-                        <circle class="timer-ring-progress" id="timerRing" cx="60" cy="60" r="54" stroke-dasharray="339.292" stroke-dashoffset="339.292" />
-                    </svg>
-                    <div class="timer-text" id="timerText">00:00</div>
-                </div>
+    <div class="hourglass">
+        <div class="sand-upper"></div>
+        <div class="sand-lower"></div>
+        <div class="sand-stream"></div>
+    </div>
+    <div class="timer-text" id="timerText">00:00</div>
+</div>
                 <div class="timer-controls">
                     <button class="btn" id="timerControlBtn">Pause</button>
                     <button class="btn" id="stopTimerBtn">Stop & Save</button>

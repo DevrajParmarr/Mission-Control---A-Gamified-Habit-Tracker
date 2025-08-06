@@ -979,43 +979,23 @@ function addTask() {
     hideLoading();
 }
 
-// Complete or uncomplete a task
+// REPLACE your old completeTask function with this one
 function completeTask(taskId) {
     showLoading();
     const task = tasks.find(t => t.id === taskId);
     if (task) {
+        // --- New logic to enforce time requirement ---
+        // This check runs when the user tries to mark an incomplete task as complete
         if (!task.completed) {
-            let scannerBonus = 0; 
-            const dropChance = 0.35 + scannerBonus;
-
-             const coreMap = {
-                'DSA': 'dsa',
-                'Development': 'dev',
-                'project': 'dev', // Projects also grant dev XP
-                'CSE': 'cse'
-                // 'other' tasks don't grant XP
-            };
-            const coreToUpdate = coreMap[task.category];
-            if (coreToUpdate) {
-                addXP(coreToUpdate, 15); // Award 15 XP per task
-            }
-
-            if (Math.random() < dropChance) {
-                const rand = Math.random();
-                let componentToAward;
-
-                if (rand < 0.60) { // 60% chance for a common component
-                    componentToAward = Math.random() < 0.5 ? 'scrap' : 'datachip';
-                } else if (rand < 0.95) { // 35% chance for an uncommon component
-                    componentToAward = Math.random() < 0.5 ? 'crystal' : 'circuit';
-                } else { // 5% chance for a rare component
-                    componentToAward = 'core';
-                }
-                
-                inventory[componentToAward]++;
-                showNotification(`Found: +1 ${components[componentToAward].name}!`);
+            if (task.priority === 'high' && task.timeSpent < 7200) {
+                const remainingTime = Math.ceil((7200 - task.timeSpent) / 60);
+                showNotification(`High-priority missions require 2 hours of focus. ${remainingTime} minutes remaining.`);
+                hideLoading();
+                return; // Stop the function here, preventing completion
             }
         }
+        // --- End of new logic ---
+
         task.completed = !task.completed;
         
         const today = new Date().toDateString();
@@ -1039,7 +1019,6 @@ function completeTask(taskId) {
     }
     hideLoading();
 }
-
 // Delete a task
 function deleteTask(taskId) {
     showLoading();
@@ -1054,6 +1033,7 @@ function deleteTask(taskId) {
 }
 
 // Render tasks for the current day
+// REPLACE your old renderTasks function with this one
 function renderTasks() {
     const taskList = document.getElementById('taskList');
     const todayTasks = tasks.filter(t => t.createdAt === new Date().toDateString());
@@ -1061,7 +1041,26 @@ function renderTasks() {
         const priorityOrder = { high: 1, medium: 2, low: 3 };
         return priorityOrder[a.priority] - priorityOrder[b.priority];
     });
-    taskList.innerHTML = todayTasks.map(task => `
+
+    taskList.innerHTML = todayTasks.map(task => {
+        // --- Logic to determine button state ---
+        const isHighPriority = task.priority === 'high';
+        const timeRequirementMet = task.timeSpent >= 7200; // 7200 seconds = 2 hours
+        const canComplete = !isHighPriority || timeRequirementMet || task.completed;
+        
+        let completeButtonHTML = '';
+        if (task.completed) {
+            completeButtonHTML = `<button class="btn-small btn-complete" onclick="completeTask(${task.id})">Done</button>`;
+        } else if (canComplete) {
+            completeButtonHTML = `<button class="btn-small btn-complete" onclick="completeTask(${task.id})">Complete</button>`;
+        } else {
+            const remainingTime = Math.ceil((7200 - task.timeSpent) / 60);
+            // Add the onclick event to the button to show the notification
+completeButtonHTML = `<button class="btn-small btn-complete disabled" title="${remainingTime} more minutes of focus required." onclick="showNotification('${remainingTime} more minutes of focus required.')">Complete</button>`;
+        }
+        // --- End of new logic ---
+
+        return `
         <div class="task-item ${task.completed ? 'task-completed completed' : 'added'}">
             <div class="task-info">
                 ${planetIcons[task.category] || planetIcons['other']}
@@ -1070,10 +1069,12 @@ function renderTasks() {
             </div>
             <div class="task-actions">
                 <button class="btn-small btn-complete" onclick="startTimer(${task.id})">Engage</button>
-                <button class="btn-small btn-complete" onclick="completeTask(${task.id})">${task.completed ? 'Done' : 'Complete'}</button>
+                ${completeButtonHTML} 
+
                 <button class="btn-small btn-delete" onclick="deleteTask(${task.id})">Delete</button>
             </div>
-        </div>`).join('');
+        </div>`;
+    }).join('');
 }
 
 // Update stats (total tasks, completed today, streak, completion rate)
