@@ -11,6 +11,18 @@
     --font-heading: 'Orbitron', sans-serif;
 }
 
+
+
+
+
+p, .stat-label, .achievement-desc {
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    -webkit-hyphens: auto;
+    -ms-hyphens: auto;
+    hyphens: auto;
+}
+
 [data-theme="light"] {
     --space-black: #e5e7eb;
     --star-white: #1e293b;
@@ -109,6 +121,15 @@ body {
     margin-bottom: 0.5rem;
 }
 
+.achievement-text {
+    flex-shrink: 1; 
+    min-width: 0;  
+}
+
+
+
+
+
 .tagline {
     font-size: clamp(0.9rem, 2.5vw, 1rem);
     color: var(--star-white);
@@ -160,7 +181,7 @@ body {
 }
 
 .panel:hover, .stat-card:hover, .info-card:hover {
-    transform: translateY(-5px);
+    transform: translateY(-3px);
     box-shadow: 0 8px 30px rgba(34, 211, 238, 0.3);
 }
 
@@ -179,6 +200,11 @@ body {
     color: var(--glow-cyan);
     margin-bottom: 0.5rem;
 }
+
+.info-header h3 {
+    word-break: break-word;
+}
+
 
 .info-header span {
     font-size: clamp(1.25rem, 3vw, 1.5rem);
@@ -262,6 +288,10 @@ input[type="text"]:focus, select:focus {
     box-shadow: 0 0 8px var(--glow-cyan);
 }
 
+.info-card, .stat-card {
+    transition: transform 0.1s ease-out;
+}
+
 .btn {
     padding: clamp(0.5rem, 1.5vw, 0.75rem) clamp(1rem, 2vw, 1.25rem);
     background: linear-gradient(90deg, var(--glow-cyan), var(--glow-purple));
@@ -275,8 +305,9 @@ input[type="text"]:focus, select:focus {
 }
 
 .btn:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 12px var(--glow-cyan);
+    transform: scale(1.02);
+    box-shadow: 0 0 15px var(--glow-cyan);
+    filter: brightness(1.09)/* Makes the button slightly brighter */
 }
 
 /* Task List */
@@ -313,6 +344,9 @@ input[type="text"]:focus, select:focus {
     font-weight: 600;
     color: var(--star-white);
     font-size: clamp(0.9rem, 2vw, 1rem);
+     overflow-wrap: break-word;
+    word-wrap: break-word;    
+    flex-shrink: 1; 
 }
 
 .priority-label {
@@ -886,4 +920,10 @@ input[type="text"]:focus, select:focus {
     input[type="text"], select {
         min-width: 100%;
     }
+}
+
+
+.achievement-name, .achievement-desc {
+    overflow-wrap: break-word;
+    word-wrap: break-word;
 }

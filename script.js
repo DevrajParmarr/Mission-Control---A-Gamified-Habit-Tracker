@@ -1247,7 +1247,8 @@ function renderAchievements() {
     achievementsModalBody.innerHTML = achievements.length > 0 ? achievements.map(a => `
         <div class="achievement-item">
             <span class="achievement-icon">${a.icon}</span>
-            <div>
+            {/* V V V V  ADD THE CLASS "achievement-text" TO THIS DIV V V V V */}
+            <div class="achievement-text"> 
                 <div class="achievement-name">${a.name}</div>
                 <div class="achievement-desc">${a.description}</div>
             </div>
@@ -1353,6 +1354,53 @@ function renderWeeklyReportModal() {
     showModal('weeklyReportModal');
 }
 
+// --- Mission Archives (Last 7 Days) ---
+function renderPastTasks() {
+    const archiveBody = document.getElementById('archiveModalBody');
+    archiveBody.innerHTML = '';
+
+    const today = new Date();
+    let tasksFound = false;
+
+    for (let i = 0; i < 7; i++) {
+        const date = new Date(today);
+        date.setDate(today.getDate() - i);
+        const dateString = date.toDateString();
+
+        const dailyTasks = tasks.filter(t => t.createdAt === dateString);
+
+        if (dailyTasks.length > 0) {
+            tasksFound = true;
+            const dayContainer = document.createElement('div');
+            dayContainer.className = 'archive-day-container';
+
+            const dayHeader = document.createElement('h4');
+            dayHeader.textContent = date.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+            dayContainer.appendChild(dayHeader);
+
+            dailyTasks.forEach(task => {
+                const taskEl = document.createElement('div');
+                taskEl.className = 'task-item ' + (task.completed ? 'task-completed' : '');
+                taskEl.innerHTML = `
+                    <div class="task-info">
+                        ${task.completed ? '✅' : '❌'}
+                        <span class="task-name">${task.name}</span>
+                        <span class="priority-label priority-${task.priority}">${task.category}</span>
+                    </div>
+                `;
+                dayContainer.appendChild(taskEl);
+            });
+            archiveBody.appendChild(dayContainer);
+        }
+    }
+
+    if (!tasksFound) {
+        archiveBody.innerHTML = '<p>No missions logged in the last 7 days.</p>';
+    }
+
+    showModal('archiveModal');
+}
+
 // Analytics Dashboard
 function renderAnalyticsDashboard() {
     if (completionChartInstance) completionChartInstance.destroy();
@@ -1418,6 +1466,45 @@ function renderAnalyticsDashboard() {
     showModal('analyticsModal');
 }
 
+
+// --- Monthly Report ---
+function renderMonthlyReport() {
+    const reportBody = document.getElementById('monthlyReportBody');
+    const today = new Date();
+    const monthAgo = new Date(today);
+    monthAgo.setDate(today.getDate() - 30);
+
+    const monthTasks = tasks.filter(t => new Date(t.createdAt) >= monthAgo);
+    const completedTasks = monthTasks.filter(t => t.completed).length;
+    const completionRate = monthTasks.length > 0 ? Math.round((completedTasks / monthTasks.length) * 100) : 0;
+    
+    // Calculate focus time this month
+    const monthlyTimeLog = {};
+    monthTasks.forEach(task => {
+        if(task.timeSpent > 0) {
+            monthlyTimeLog[task.category] = (monthlyTimeLog[task.category] || 0) + task.timeSpent;
+        }
+    });
+
+    const totalFocusTime = Object.values(monthlyTimeLog).reduce((a, b) => a + b, 0);
+    const focusBreakdown = Object.entries(monthlyTimeLog).map(([cat, time]) => `<li>${cat}: ${Math.floor(time / 60)} min</li>`).join('');
+
+    const report = `
+        <h3>Mission Performance (Last 30 Days)</h3>
+        <p><strong>Total Missions Logged:</strong> ${monthTasks.length}</p>
+        <p><strong>Missions Completed:</strong> ${completedTasks}</p>
+        <p><strong>Overall Success Rate:</strong> ${completionRate}%</p>
+        <hr>
+        <h3>Focus Analysis</h3>
+        <p><strong>Total Focus Time:</strong> ${Math.floor(totalFocusTime / 60)} minutes</p>
+        <ul>${focusBreakdown || '<li>No focus time logged.</li>'}</ul>
+        <hr>
+        <p><strong>Insight:</strong> ${completionRate > 75 ? 'Excellent performance this month! Your discipline is paying off.' : 'Good effort! Focus on consistency to boost your success rate next month.'}</p>
+    `;
+    reportBody.innerHTML = report;
+    showModal('monthlyReportModal');
+}
+
 // Theme Toggle
 function toggleTheme() {
     const body = document.body;
@@ -1472,3 +1559,29 @@ setInterval(() => {
 document.addEventListener('DOMContentLoaded', () => {
     renderAchievements();
 });
+
+
+
+document.querySelectorAll('.info-card, .stat-card').forEach(card => {
+    card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        const rotateX = (y / rect.height - 0.5) * -15; // Controls vertical tilt
+        const rotateY = (x / rect.width - 0.5) * 15;   // Controls horizontal tilt
+
+        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+    });
+
+    card.addEventListener('mouseleave', () => {
+        card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)'; // Resets the tilt
+    });
+});
+
+
+document.getElementById('archiveTrigger').addEventListener('click', renderPastTasks);
+document.getElementById('closeArchiveModal').addEventListener('click', () => hideModal('archiveModal'));
+
+document.getElementById('monthlyReportTrigger').addEventListener('click', renderMonthlyReport);
+document.getElementById('closeMonthlyReportModal').addEventListener('click', () => hideModal('monthlyReportModal'));
