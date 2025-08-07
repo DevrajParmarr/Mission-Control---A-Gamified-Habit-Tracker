@@ -1089,3 +1089,34 @@ input[type="text"]:focus, select:focus {
     background: #4a5568;
     transform: none;
 }
+
+/* Update the main display area styling */
+.timer-display {
+    margin: 1.5rem auto;
+    padding: 1rem 0;
+}
+
+/* Make the timer text larger and change its font */
+.timer-text {
+    position: static; /* Removes absolute positioning */
+    font-family: 'Orbitron', sans-serif; /* Use a more digital-style font */
+    font-size: clamp(3rem, 10vw, 4.5rem); /* Increase font size significantly */
+    font-weight: 700;
+    color: var(--star-white);
+    text-shadow: 0 0 10px var(--glow-cyan), 0 0 20px var(--glow-cyan);
+    animation: textGlow 1.5s ease-in-out infinite;
+}
+
+/* Adjust the mission name styling */
+.timer-mission-name {
+    color: var(--star-white); /* Change from purple to white */
+    opacity: 0.8;
+    font-family: var(--font-primary); /* Use the standard font */
+    font-size: clamp(1rem, 2.5vw, 1.25rem);
+    margin-bottom: 0.5rem; /* Reduce space below it */
+    font-weight: 500;
+}
+
+.timer-controls {
+    margin-top: 1.5rem;
+}

@@ -1368,7 +1368,6 @@ function toggleTimer() {
         timerControlBtn.textContent = 'Pause';
     }
 }
-
 function stopTimer() {
     if (timerInterval) {
         clearInterval(timerInterval);
@@ -1376,27 +1375,26 @@ function stopTimer() {
     }
     const task = tasks.find(t => t.id === activeTimerTaskId);
     if (task) {
+        // Assign the final time to the task
         task.timeSpent = timerSeconds;
-        timeLog[task.category] = (timeLog[task.category] || 0) + timerSeconds;
+
+        // The timeLog is already up-to-date from the interval,
+        // so we just need to save the data.
         saveData();
+
         showNotification(`Focus time logged for "${task.name}": ${Math.floor(timerSeconds / 60)} minutes.`);
     }
     activeTimerTaskId = null;
     timerSeconds = 0;
     document.getElementById('focus-timer-modal').classList.add('hidden');
-    renderTimeAnalysis();
-}
 
-function updateTimerDisplay() {
+    // It's good practice to re-render analytics right after stopping
+    renderTimeAnalysis();
+}function updateTimerDisplay() {
     const minutes = Math.floor(timerSeconds / 60);
     const seconds = timerSeconds % 60;
     document.getElementById('timerText').textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-    const totalDuration = 25 * 60; // 25-minute Pomodoro session
-    const progress = timerSeconds / totalDuration;
-    const dashOffset = 339.292 * (1 - Math.min(progress, 1));
-    document.getElementById('timerRing').setAttribute('stroke-dashoffset', dashOffset);
 }
-
 // Save data to localStorage
 function saveData() {
     localStorage.setItem('tasks', JSON.stringify(tasks));
